@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <fstream>
 #include <future>
 #include <iostream>
 #include <sstream>
@@ -73,15 +74,28 @@ void GatewayServer::setupRoutes() {
     return response;
   });
 
-  // Root endpoint
+  // Serve frontend HTML at root
   CROW_ROUTE(app_, "/")
   ([]() {
-    crow::json::wvalue response;
-    response["service"] = "Geocoding Gateway";
-    response["version"] = "1.0.0";
-    response["endpoints"] = crow::json::wvalue::list({"/health",
-                                                       "/api/findAddress"});
-    return response;
+    // Read and serve the frontend HTML file
+    std::ifstream file("/app/frontend/index.html");
+    if (!file.is_open()) {
+      // Fallback to API info if frontend not found
+      crow::json::wvalue response;
+      response["service"] = "Geocoding Gateway";
+      response["version"] = "1.0.0";
+      response["endpoints"] = crow::json::wvalue::list({"/health",
+                                                         "/api/findAddress"});
+      return crow::response(response);
+    }
+
+    std::string html_content((std::istreambuf_iterator<char>(file)),
+                             std::istreambuf_iterator<char>());
+    file.close();
+
+    crow::response res(html_content);
+    res.set_header("Content-Type", "text/html");
+    return res;
   });
 
   // Find address endpoint

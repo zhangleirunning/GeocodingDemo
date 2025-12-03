@@ -47,6 +47,31 @@ docker-compose logs -f
 
 Once the services are running, you can test the gateway:
 
+#### Option 1: Use the Web Interface (Recommended)
+
+Open the beautiful test portal in your browser:
+
+```bash
+# macOS
+open frontend/index.html
+
+# Linux
+xdg-open frontend/index.html
+
+# Or serve with Python
+cd frontend && python3 -m http.server 8000
+# Then open: http://localhost:8000
+```
+
+The web interface provides:
+- 🎨 Beautiful, modern UI
+- 🔍 Real-time search with example queries
+- 📊 Result ranking and relevance scores
+- 🗺️ Google Maps integration
+- 📱 Mobile responsive design
+
+#### Option 2: Use curl
+
 ```bash
 # Health check
 curl http://localhost:18080/health
@@ -54,7 +79,7 @@ curl http://localhost:18080/health
 # Search for an address
 curl -X POST http://localhost:18080/api/findAddress \
   -H "Content-Type: application/json" \
-  -d '{"address": "123 Main Street Seattle"}'
+  -d '{"address": "Salinas"}'
 ```
 
 ### Using Custom Data Files

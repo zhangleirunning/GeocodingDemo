@@ -19,27 +19,13 @@ RUN git clone https://github.com/Microsoft/vcpkg.git /opt/vcpkg && \
 # Set working directory
 WORKDIR /app
 
-# Copy only dependency files first (for better caching)
-# This layer will be cached unless these files change
-COPY vcpkg.json CMakeLists.txt ./
-COPY proto ./proto
+# Copy all project files
+COPY . .
 
-# Install dependencies via vcpkg (this is the slow part - ~5-7 minutes)
-# This layer will be cached and reused on subsequent builds
-RUN mkdir -p build && \
+# Clean any existing build artifacts and build the project
+RUN rm -rf build && \
+    mkdir -p build && \
     cd build && \
-    cmake .. -DCMAKE_TOOLCHAIN_FILE=/opt/vcpkg/scripts/buildsystems/vcpkg.cmake && \
-    echo "Dependencies installed and cached"
-
-# Now copy the rest of the source code
-# Changes to your code won't invalidate the dependency cache above
-COPY include ./include
-COPY src ./src
-COPY data ./data
-COPY *.cpp ./
-
-# Build the project (only your code compiles here - ~30 seconds)
-RUN cd build && \
     cmake .. -DCMAKE_TOOLCHAIN_FILE=/opt/vcpkg/scripts/buildsystems/vcpkg.cmake && \
     make data_node_server gateway_server -j$(nproc)
 
@@ -60,6 +46,9 @@ COPY --from=builder /app/build/gateway_server /app/gateway_server
 
 # Copy data files
 COPY --from=builder /app/data /app/data
+
+# Copy frontend files for gateway
+COPY --from=builder /app/frontend /app/frontend
 
 # Create directory for custom data files
 RUN mkdir -p /app/data
