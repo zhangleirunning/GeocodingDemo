@@ -1,6 +1,10 @@
-# Crow C++ Hello World
+# Geocoding System - Data Nodes
 
-A simple "Hello World" web server using the Crow C++ framework.
+A distributed geocoding system with data nodes that provide efficient address search capabilities using RadixTree and ForwardIndex structures.
+
+## Code Style
+
+This project follows the **Google C++ Style Guide**. See [docs/STYLE_GUIDE.md](docs/STYLE_GUIDE.md) for detailed information.
 
 ## Option 1: Run with Docker
 
@@ -77,3 +81,40 @@ make
 The server will start on http://localhost:18080
 
 Visit http://localhost:18080/ in your browser to see "Hello world"
+
+
+## Development
+
+### Code Formatting
+
+To ensure code follows Google C++ Style Guide:
+
+```bash
+# Install clang-format (macOS)
+brew install clang-format
+
+# Install clang-format (Linux)
+sudo apt-get install clang-format
+
+# Format all code
+cmake --build build --target format
+
+# Or use the script
+./scripts/format_code.sh
+
+# Check formatting without modifying files
+cmake --build build --target check-format
+```
+
+### Running Tests
+
+```bash
+# Build and run all tests
+cmake --build build
+./build/tests
+
+# Run specific test suite
+./build/tests --gtest_filter="AddressRecordTest.*"
+```
+
+For more details on code style enforcement, see [docs/STYLE_GUIDE.md](docs/STYLE_GUIDE.md).

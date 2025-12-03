@@ -1,0 +1,20 @@
+# Pre-commit hooks for enforcing Google C++ Style Guide
+# Install: pip install pre-commit && pre-commit install
+
+repos:
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v18.1.8
+    hooks:
+      - id: clang-format
+        types_or: [c++, c]
+        args: ['-style=file', '-i']
+
+  - repo: local
+    hooks:
+      - id: clang-tidy
+        name: clang-tidy
+        entry: clang-tidy
+        language: system
+        types: [c++]
+        args: ['-p=build', '--']
+        pass_filenames: true

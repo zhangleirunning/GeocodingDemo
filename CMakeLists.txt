@@ -33,6 +33,7 @@ target_link_libraries(gateway_server PRIVATE Crow::Crow)
 # Test executable
 enable_testing()
 add_executable(tests
+    test/data_node/address_record_test.cpp
     test/data_node/csv_parser_test.cpp
     test/data_node/address_normalizer_test.cpp
     test/data_node/radix_tree_index_test.cpp
@@ -53,3 +54,31 @@ target_link_libraries(tests PRIVATE
 
 include(GoogleTest)
 gtest_discover_tests(tests)
+
+# Code formatting and style checking targets
+find_program(CLANG_FORMAT "clang-format")
+if(CLANG_FORMAT)
+    file(GLOB_RECURSE ALL_SOURCE_FILES
+        ${CMAKE_SOURCE_DIR}/include/*.h
+        ${CMAKE_SOURCE_DIR}/src/*.cpp
+        ${CMAKE_SOURCE_DIR}/test/*.cpp
+        ${CMAKE_SOURCE_DIR}/*.cpp
+    )
+    
+    add_custom_target(
+        format
+        COMMAND ${CLANG_FORMAT} -i -style=file ${ALL_SOURCE_FILES}
+        COMMENT "Running clang-format to format code"
+    )
+    
+    add_custom_target(
+        check-format
+        COMMAND ${CLANG_FORMAT} -style=file --dry-run --Werror ${ALL_SOURCE_FILES}
+        COMMENT "Checking code formatting"
+    )
+endif()
+
+find_program(CLANG_TIDY "clang-tidy")
+if(CLANG_TIDY)
+    set(CMAKE_CXX_CLANG_TIDY ${CLANG_TIDY} -p=${CMAKE_BINARY_DIR})
+endif()
