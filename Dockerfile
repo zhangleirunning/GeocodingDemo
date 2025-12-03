@@ -19,13 +19,29 @@ RUN git clone https://github.com/Microsoft/vcpkg.git /opt/vcpkg && \
 # Set working directory
 WORKDIR /app
 
-# Copy project files
-COPY . .
+# Copy only dependency files first (for better caching)
+# This layer will be cached unless these files change
+COPY vcpkg.json CMakeLists.txt ./
+COPY proto ./proto
 
-# Build the project (builds both data_node_server and gateway_server)
-RUN mkdir -p build && cd build && \
+# Install dependencies via vcpkg (this is the slow part - ~5-7 minutes)
+# This layer will be cached and reused on subsequent builds
+RUN mkdir -p build && \
+    cd build && \
     cmake .. -DCMAKE_TOOLCHAIN_FILE=/opt/vcpkg/scripts/buildsystems/vcpkg.cmake && \
-    make data_node_server gateway_server
+    echo "Dependencies installed and cached"
+
+# Now copy the rest of the source code
+# Changes to your code won't invalidate the dependency cache above
+COPY include ./include
+COPY src ./src
+COPY data ./data
+COPY *.cpp ./
+
+# Build the project (only your code compiles here - ~30 seconds)
+RUN cd build && \
+    cmake .. -DCMAKE_TOOLCHAIN_FILE=/opt/vcpkg/scripts/buildsystems/vcpkg.cmake && \
+    make data_node_server gateway_server -j$(nproc)
 
 # Runtime stage - smaller image
 FROM debian:bookworm-slim

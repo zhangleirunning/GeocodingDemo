@@ -10,6 +10,8 @@ This project follows the **Google C++ Style Guide**. See [docs/STYLE_GUIDE.md](d
 
 The easiest way to run the complete system is using Docker Compose, which starts both data nodes and the gateway automatically.
 
+> **⏱️ Note**: The first build takes 5-10 minutes as it compiles C++ dependencies (gRPC, Protobuf, etc.). Subsequent builds are much faster (~30-60 seconds) thanks to Docker layer caching. See [DOCKER_BUILD_GUIDE.md](DOCKER_BUILD_GUIDE.md) for optimization tips.
+
 ### Start All Services
 
 ```bash

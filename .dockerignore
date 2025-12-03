@@ -1,0 +1,43 @@
+# Build artifacts
+build/
+*.o
+*.a
+*.so
+*.dylib
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+docs/
+
+# Test executables
+test_grpc_client
+test_search
+test_radix_bug
+
+# vcpkg (will be installed fresh in container)
+vcpkg/
+vcpkg_installed/
+
+# macOS
+.DS_Store
+
+# Docker
+.dockerignore
+Dockerfile
+docker-compose.yml
+
+# CI/CD
+.github/
+
+# Kiro specs
+.kiro/

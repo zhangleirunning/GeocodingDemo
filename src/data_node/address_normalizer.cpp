@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cctype>
 #include <sstream>
+#include <vector>
 
 AddressNormalizer::AddressNormalizer() {
   // Initialize suffix map with common abbreviations
