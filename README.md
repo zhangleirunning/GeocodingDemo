@@ -6,9 +6,64 @@ A distributed geocoding system with data nodes that provide efficient address se
 
 This project follows the **Google C++ Style Guide**. See [docs/STYLE_GUIDE.md](docs/STYLE_GUIDE.md) for detailed information.
 
-## Option 1: Run with Docker
+## Option 1: Run with Docker Compose (Recommended)
 
-The easiest way to run this project is using Docker. The Docker image supports running both data node servers and the gateway server.
+The easiest way to run the complete system is using Docker Compose, which starts both data nodes and the gateway automatically.
+
+### Start All Services
+
+```bash
+# Build and start all services (2 data nodes + gateway)
+docker-compose up --build
+
+# Or run in detached mode
+docker-compose up -d --build
+```
+
+### Stop All Services
+
+```bash
+docker-compose down
+```
+
+### View Logs
+
+```bash
+# View all logs
+docker-compose logs
+
+# View logs for specific service
+docker-compose logs gateway
+docker-compose logs data_node_0
+docker-compose logs data_node_1
+
+# Follow logs in real-time
+docker-compose logs -f
+```
+
+### Test the Gateway API
+
+Once the services are running, you can test the gateway:
+
+```bash
+# Health check
+curl http://localhost:18080/health
+
+# Search for an address
+curl -X POST http://localhost:18080/api/findAddress \
+  -H "Content-Type: application/json" \
+  -d '{"address": "123 Main Street Seattle"}'
+```
+
+### Using Custom Data Files
+
+To use custom data files, modify the volume mounts in `docker-compose.yml` or place your CSV files in the `./data` directory with the names:
+- `shard_0_data_demo.csv`
+- `shard_1_data_demo.csv`
+
+## Option 2: Run with Docker (Manual)
+
+You can also run individual containers manually if you need more control.
 
 ### Build the Docker Image
 
@@ -71,7 +126,7 @@ docker run -p 50051:50051 \
   geocoding-system
 ```
 
-## Option 2: Run on Debian (without Docker)
+## Option 3: Build and Run Locally (without Docker)
 
 ### Prerequisites
 

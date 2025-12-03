@@ -69,12 +69,20 @@ target_link_libraries(data_node_server PRIVATE
     protobuf::libprotobuf
 )
 
-# Gateway Node executable (placeholder for future implementation)
+# Gateway Node executable
 add_executable(gateway_server
     gateway_main.cpp
     src/gateway/gateway_server.cpp
+    src/data_node/address_normalizer.cpp
+    ${PROTO_SRCS}
+    ${GRPC_SRCS}
 )
-target_link_libraries(gateway_server PRIVATE Crow::Crow)
+target_link_libraries(gateway_server PRIVATE
+    Crow::Crow
+    gRPC::grpc++
+    gRPC::grpc++_reflection
+    protobuf::libprotobuf
+)
 
 # Test gRPC client
 add_executable(test_grpc_client
@@ -110,16 +118,25 @@ add_executable(tests
     test/data_node/forward_index_test.cpp
     test/data_node/data_node_test.cpp
     test/data_node/property_tests.cpp
+    test/gateway/gateway_server_test.cpp
+    test/gateway/gateway_integration_test.cpp
     src/data_node/csv_parser.cpp
     src/data_node/address_normalizer.cpp
     src/data_node/radix_tree_index.cpp
     src/data_node/forward_index.cpp
     src/data_node/data_node.cpp
+    src/gateway/gateway_server.cpp
+    ${PROTO_SRCS}
+    ${GRPC_SRCS}
 )
 target_link_libraries(tests PRIVATE
     GTest::gtest
     GTest::gtest_main
     rapidcheck
+    Crow::Crow
+    gRPC::grpc++
+    gRPC::grpc++_reflection
+    protobuf::libprotobuf
 )
 
 include(GoogleTest)
