@@ -43,8 +43,8 @@ struct AddressRecord {
         city(city_),
         postcode(postcode_),
         original_street(original_street_),
-        original_city(original_city_),
-        original_unit(original_unit_) {}
+        original_unit(original_unit_),
+        original_city(original_city_) {}
 
   // Equality operator
   bool operator==(const AddressRecord& other) const {
@@ -59,8 +59,8 @@ struct AddressRecord {
            unit == other.unit && city == other.city &&
            postcode == other.postcode &&
            original_street == other.original_street &&
-           original_city == other.original_city &&
-           original_unit == other.original_unit;
+           original_unit == other.original_unit &&
+           original_city == other.original_city;
   }
 
   // Inequality operator

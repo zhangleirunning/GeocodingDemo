@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package datanode;
+
+// Service definition for Data Node
+service DataNodeService {
+  // Search for addresses matching query terms
+  rpc Search(SearchRequest) returns (SearchResponse);
+
+  // Get node statistics
+  rpc GetStatistics(StatisticsRequest) returns (StatisticsResponse);
+}
+
+// Request message for search operation
+message SearchRequest {
+  repeated string query_terms = 1;
+}
+
+// Response message for search operation
+message SearchResponse {
+  repeated AddressRecord results = 1;
+  int32 result_count = 2;
+}
+
+// Address record structure
+message AddressRecord {
+  string hash = 1;
+  double longitude = 2;
+  double latitude = 3;
+  string number = 4;
+  string street = 5;
+  string unit = 6;
+  string city = 7;
+  string postcode = 8;
+}
+
+// Request message for statistics
+message StatisticsRequest {
+}
+
+// Response message for statistics
+message StatisticsResponse {
+  int64 total_records = 1;
+  int64 radix_tree_memory = 2;
+  int64 forward_index_size = 3;
+  int64 load_time_ms = 4;
+}

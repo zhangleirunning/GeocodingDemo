@@ -8,9 +8,48 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(Crow CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
 find_package(rapidcheck CONFIG REQUIRED)
+find_package(gRPC CONFIG REQUIRED)
+find_package(Protobuf CONFIG REQUIRED)
 
 # Include directories
 include_directories(${CMAKE_SOURCE_DIR}/include)
+
+# Generate gRPC/Protobuf files
+set(PROTO_FILES ${CMAKE_SOURCE_DIR}/proto/data_node.proto)
+set(PROTO_OUTPUT_DIR ${CMAKE_BINARY_DIR}/generated)
+file(MAKE_DIRECTORY ${PROTO_OUTPUT_DIR})
+
+# Get protobuf and grpc plugin paths
+get_target_property(PROTOBUF_PROTOC protobuf::protoc IMPORTED_LOCATION_RELEASE)
+if(NOT PROTOBUF_PROTOC)
+    get_target_property(PROTOBUF_PROTOC protobuf::protoc IMPORTED_LOCATION_DEBUG)
+endif()
+if(NOT PROTOBUF_PROTOC)
+    get_target_property(PROTOBUF_PROTOC protobuf::protoc IMPORTED_LOCATION)
+endif()
+
+find_program(GRPC_CPP_PLUGIN grpc_cpp_plugin REQUIRED)
+
+# Generate protobuf and gRPC sources
+set(PROTO_SRCS ${PROTO_OUTPUT_DIR}/data_node.pb.cc)
+set(PROTO_HDRS ${PROTO_OUTPUT_DIR}/data_node.pb.h)
+set(GRPC_SRCS ${PROTO_OUTPUT_DIR}/data_node.grpc.pb.cc)
+set(GRPC_HDRS ${PROTO_OUTPUT_DIR}/data_node.grpc.pb.h)
+
+add_custom_command(
+    OUTPUT ${PROTO_SRCS} ${PROTO_HDRS} ${GRPC_SRCS} ${GRPC_HDRS}
+    COMMAND ${PROTOBUF_PROTOC}
+    ARGS --grpc_out=${PROTO_OUTPUT_DIR}
+         --cpp_out=${PROTO_OUTPUT_DIR}
+         --plugin=protoc-gen-grpc=${GRPC_CPP_PLUGIN}
+         -I${CMAKE_SOURCE_DIR}/proto
+         ${PROTO_FILES}
+    DEPENDS ${PROTO_FILES}
+    COMMENT "Generating gRPC and Protobuf files"
+)
+
+# Include generated proto headers
+include_directories(${PROTO_OUTPUT_DIR})
 
 # Data Node executable
 add_executable(data_node_server
@@ -20,8 +59,15 @@ add_executable(data_node_server
     src/data_node/radix_tree_index.cpp
     src/data_node/forward_index.cpp
     src/data_node/data_node.cpp
+    ${PROTO_SRCS}
+    ${GRPC_SRCS}
 )
-target_link_libraries(data_node_server PRIVATE Crow::Crow)
+target_link_libraries(data_node_server PRIVATE
+    Crow::Crow
+    gRPC::grpc++
+    gRPC::grpc++_reflection
+    protobuf::libprotobuf
+)
 
 # Gateway Node executable (placeholder for future implementation)
 add_executable(gateway_server
@@ -29,6 +75,30 @@ add_executable(gateway_server
     src/gateway/gateway_server.cpp
 )
 target_link_libraries(gateway_server PRIVATE Crow::Crow)
+
+# Test gRPC client
+add_executable(test_grpc_client
+    test_grpc_client.cpp
+    ${PROTO_SRCS}
+    ${GRPC_SRCS}
+)
+target_link_libraries(test_grpc_client PRIVATE
+    gRPC::grpc++
+    gRPC::grpc++_reflection
+    protobuf::libprotobuf
+)
+
+# Quick search test
+add_executable(test_search
+    test_search.cpp
+    ${PROTO_SRCS}
+    ${GRPC_SRCS}
+)
+target_link_libraries(test_search PRIVATE
+    gRPC::grpc++
+    gRPC::grpc++_reflection
+    protobuf::libprotobuf
+)
 
 # Test executable
 enable_testing()
@@ -46,8 +116,8 @@ add_executable(tests
     src/data_node/forward_index.cpp
     src/data_node/data_node.cpp
 )
-target_link_libraries(tests PRIVATE 
-    GTest::gtest 
+target_link_libraries(tests PRIVATE
+    GTest::gtest
     GTest::gtest_main
     rapidcheck
 )
@@ -64,13 +134,13 @@ if(CLANG_FORMAT)
         ${CMAKE_SOURCE_DIR}/test/*.cpp
         ${CMAKE_SOURCE_DIR}/*.cpp
     )
-    
+
     add_custom_target(
         format
         COMMAND ${CLANG_FORMAT} -i -style=file ${ALL_SOURCE_FILES}
         COMMENT "Running clang-format to format code"
     )
-    
+
     add_custom_target(
         check-format
         COMMAND ${CLANG_FORMAT} -style=file --dry-run --Werror ${ALL_SOURCE_FILES}

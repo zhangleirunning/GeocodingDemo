@@ -4,6 +4,8 @@
   "dependencies": [
     "crow",
     "gtest",
-    "rapidcheck"
+    "rapidcheck",
+    "grpc",
+    "protobuf"
   ]
 }

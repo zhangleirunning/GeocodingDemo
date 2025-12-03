@@ -79,9 +79,9 @@ std::optional<AddressRecord> CSVParser::parseRecord(const std::string& line) {
     std::string street = fields[3];
     std::string unit = fields[4];
     std::string city = fields[5];
-    // Note: DISTRICT (fields[6]) and REGION (fields[7]) are not in AddressRecord
+    // Note: DISTRICT (fields[6]) and REGION (fields[7]) are not stored in AddressRecord
     std::string postcode = fields[8];
-    // Note: ID (fields[9]) is not in AddressRecord
+    // Note: ID (fields[9]) is not stored in AddressRecord
     std::string hash = fields[10];
 
     // Create AddressRecord with original values
