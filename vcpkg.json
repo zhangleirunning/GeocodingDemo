@@ -1,7 +1,9 @@
 {
-  "name": "crow-hello-world",
+  "name": "geocoding-system",
   "version": "1.0.0",
   "dependencies": [
-    "crow"
+    "crow",
+    "gtest",
+    "rapidcheck"
   ]
 }
