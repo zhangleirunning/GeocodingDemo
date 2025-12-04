@@ -1,0 +1,33 @@
+# Development Docker Compose Configuration
+# Usage: docker-compose -f docker/docker-compose.yml -f docker/docker-compose.dev.yml up
+
+services:
+  data_node_0:
+    build:
+      target: builder  # Use builder stage for development
+    volumes:
+      - ../data:/app/data:ro
+      - ../build:/app/build  # Mount build directory for faster iteration
+    environment:
+      - LOG_LEVEL=DEBUG
+
+  data_node_1:
+    build:
+      target: builder
+    volumes:
+      - ../data:/app/data:ro
+      - ../build:/app/build
+    environment:
+      - LOG_LEVEL=DEBUG
+
+  gateway:
+    build:
+      target: builder
+    volumes:
+      - ../web:/app/web  # Hot reload web frontend changes
+    environment:
+      - LOG_LEVEL=DEBUG
+      - GRPC_TIMEOUT_MS=10000  # Longer timeout for debugging
+    ports:
+      - "18080:18080"
+      - "9090:9090"  # Optional: debugging port

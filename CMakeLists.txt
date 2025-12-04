@@ -53,7 +53,7 @@ include_directories(${PROTO_OUTPUT_DIR})
 
 # Data Node executable
 add_executable(data_node_server
-    data_node_main.cpp
+    apps/data_node/main.cpp
     src/data_node/csv_parser.cpp
     src/data_node/address_normalizer.cpp
     src/data_node/radix_tree_index.cpp
@@ -71,7 +71,7 @@ target_link_libraries(data_node_server PRIVATE
 
 # Gateway Node executable
 add_executable(gateway_server
-    gateway_main.cpp
+    apps/gateway/main.cpp
     src/gateway/gateway_server.cpp
     src/data_node/address_normalizer.cpp
     ${PROTO_SRCS}
@@ -84,25 +84,25 @@ target_link_libraries(gateway_server PRIVATE
     protobuf::libprotobuf
 )
 
-# Test gRPC client
-add_executable(test_grpc_client
-    test_grpc_client.cpp
+# Tool: gRPC client
+add_executable(grpc_client
+    apps/tools/grpc_client.cpp
     ${PROTO_SRCS}
     ${GRPC_SRCS}
 )
-target_link_libraries(test_grpc_client PRIVATE
+target_link_libraries(grpc_client PRIVATE
     gRPC::grpc++
     gRPC::grpc++_reflection
     protobuf::libprotobuf
 )
 
-# Quick search test
-add_executable(test_search
-    test_search.cpp
+# Tool: Search utility
+add_executable(search_tool
+    apps/tools/search_tool.cpp
     ${PROTO_SRCS}
     ${GRPC_SRCS}
 )
-target_link_libraries(test_search PRIVATE
+target_link_libraries(search_tool PRIVATE
     gRPC::grpc++
     gRPC::grpc++_reflection
     protobuf::libprotobuf
@@ -148,8 +148,8 @@ if(CLANG_FORMAT)
     file(GLOB_RECURSE ALL_SOURCE_FILES
         ${CMAKE_SOURCE_DIR}/include/*.h
         ${CMAKE_SOURCE_DIR}/src/*.cpp
+        ${CMAKE_SOURCE_DIR}/apps/*.cpp
         ${CMAKE_SOURCE_DIR}/test/*.cpp
-        ${CMAKE_SOURCE_DIR}/*.cpp
     )
 
     add_custom_target(

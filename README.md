@@ -53,13 +53,13 @@ Open the beautiful test portal in your browser:
 
 ```bash
 # macOS
-open frontend/index.html
+open web/index.html
 
 # Linux
-xdg-open frontend/index.html
+xdg-open web/index.html
 
 # Or serve with Python
-cd frontend && python3 -m http.server 8000
+cd web && python3 -m http.server 8000
 # Then open: http://localhost:8000
 ```
 

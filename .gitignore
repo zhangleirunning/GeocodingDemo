@@ -3,3 +3,4 @@ build/
 .kiro/
 .git/
 *.log
+.DS_Store

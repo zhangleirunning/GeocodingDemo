@@ -1,7 +1,31 @@
 #!/bin/bash
 # Script to check C++ code style compliance
+#
+# Requirements:
+#   - clang-format (install: brew install llvm)
+#   - clang-tidy (install: brew install llvm)
+#
+# Usage:
+#   ./scripts/check_style.sh
 
 set -e
+
+# Check if required tools are installed
+if ! command -v clang-format &> /dev/null; then
+    echo "❌ Error: clang-format is not installed"
+    echo ""
+    echo "Install with:"
+    echo "  macOS:  brew install llvm"
+    echo "  Linux:  apt-get install clang-format"
+    echo ""
+    exit 1
+fi
+
+if ! command -v clang-tidy &> /dev/null; then
+    echo "⚠️  Warning: clang-tidy is not installed (optional)"
+    echo "  Install with: brew install llvm (macOS) or apt-get install clang-tidy (Linux)"
+    echo ""
+fi
 
 echo "Checking C++ code style with clang-format..."
 

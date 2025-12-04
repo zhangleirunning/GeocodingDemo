@@ -10,13 +10,13 @@
 // Helper to get the correct path to test data
 static std::string getTestDataPath(const std::string& filename) {
   // Try relative to build directory first
-  std::string path = "../test/test_data/" + filename;
+  std::string path = "../test/fixtures/" + filename;
   std::ifstream test_file(path);
   if (test_file.good()) {
     return path;
   }
   // Fall back to relative to workspace root
-  return "test/test_data/" + filename;
+  return "test/fixtures/" + filename;
 }
 
 // Test initialization with valid CSV file

@@ -1,0 +1,58 @@
+# Production Docker Compose Configuration
+# Usage: docker-compose -f docker/docker-compose.yml -f docker/docker-compose.prod.yml up
+
+services:
+  data_node_0:
+    restart: always
+    environment:
+      - LOG_LEVEL=INFO
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '1.0'
+          memory: 1G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  data_node_1:
+    restart: always
+    environment:
+      - LOG_LEVEL=INFO
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '1.0'
+          memory: 1G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  gateway:
+    restart: always
+    environment:
+      - LOG_LEVEL=INFO
+      - GRPC_TIMEOUT_MS=5000
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '1.0'
+          memory: 1G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

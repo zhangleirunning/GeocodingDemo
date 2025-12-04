@@ -74,13 +74,13 @@ void GatewayServer::setupRoutes() {
     return response;
   });
 
-  // Serve frontend HTML at root
+  // Serve web frontend HTML at root
   CROW_ROUTE(app_, "/")
   ([]() {
-    // Read and serve the frontend HTML file
-    std::ifstream file("/app/frontend/index.html");
+    // Read and serve the web frontend HTML file
+    std::ifstream file("/app/web/index.html");
     if (!file.is_open()) {
-      // Fallback to API info if frontend not found
+      // Fallback to API info if web frontend not found
       crow::json::wvalue response;
       response["service"] = "Geocoding Gateway";
       response["version"] = "1.0.0";

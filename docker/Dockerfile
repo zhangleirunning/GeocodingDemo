@@ -47,8 +47,8 @@ COPY --from=builder /app/build/gateway_server /app/gateway_server
 # Copy data files
 COPY --from=builder /app/data /app/data
 
-# Copy frontend files for gateway
-COPY --from=builder /app/frontend /app/frontend
+# Copy web frontend files for gateway
+COPY --from=builder /app/web /app/web
 
 # Create directory for custom data files
 RUN mkdir -p /app/data
@@ -63,7 +63,7 @@ ENV SERVICE_TYPE=data_node
 EXPOSE 50051 50052 18080
 
 # Entrypoint script to run the appropriate service
-COPY docker-entrypoint.sh /app/docker-entrypoint.sh
-RUN chmod +x /app/docker-entrypoint.sh
+COPY docker/entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
-ENTRYPOINT ["/app/docker-entrypoint.sh"]
+ENTRYPOINT ["/app/entrypoint.sh"]

@@ -11,7 +11,7 @@
 TEST(CSVParserTest, ParseWellFormedCSV) {
   CSVParser parser;
   std::vector<AddressRecord> records =
-      parser.parse("test/test_data/valid_addresses.csv");
+      parser.parse("test/fixtures/valid_addresses.csv");
 
   // Should successfully parse all 5 records
   EXPECT_EQ(records.size(), 5);
@@ -43,7 +43,7 @@ TEST(CSVParserTest, ParseWellFormedCSV) {
 TEST(CSVParserTest, ParseCSVWithEmptyOptionalFields) {
   CSVParser parser;
   std::vector<AddressRecord> records =
-      parser.parse("test/test_data/empty_optional_fields.csv");
+      parser.parse("test/fixtures/empty_optional_fields.csv");
 
   // Should successfully parse all 3 records despite empty fields
   EXPECT_EQ(records.size(), 3);
@@ -63,7 +63,7 @@ TEST(CSVParserTest, ParseCSVWithEmptyOptionalFields) {
 TEST(CSVParserTest, HandleMissingCSVFile) {
   CSVParser parser;
   std::vector<AddressRecord> records =
-      parser.parse("test/test_data/nonexistent_file.csv");
+      parser.parse("test/fixtures/nonexistent_file.csv");
 
   // Should return empty vector when file doesn't exist
   EXPECT_EQ(records.size(), 0);
@@ -75,7 +75,7 @@ TEST(CSVParserTest, HandleMissingCSVFile) {
 TEST(CSVParserTest, HandleMalformedRecords) {
   CSVParser parser;
   std::vector<AddressRecord> records =
-      parser.parse("test/test_data/malformed_addresses.csv");
+      parser.parse("test/fixtures/malformed_addresses.csv");
 
   // Should parse only valid records and skip malformed ones
   // Valid: record 1 (index 0) and record 7 (index 6)
@@ -99,7 +99,7 @@ TEST(CSVParserTest, HandleMalformedRecords) {
 TEST(CSVParserTest, ValidateCoordinateRanges) {
   CSVParser parser;
   std::vector<AddressRecord> records =
-      parser.parse("test/test_data/malformed_addresses.csv");
+      parser.parse("test/fixtures/malformed_addresses.csv");
 
   // Records with lon=-200.0 and lat=100.0 should be rejected
   for (const auto& record : records) {
@@ -114,7 +114,7 @@ TEST(CSVParserTest, ValidateCoordinateRanges) {
 TEST(CSVParserTest, HandleInsufficientFields) {
   CSVParser parser;
   std::vector<AddressRecord> records =
-      parser.parse("test/test_data/malformed_addresses.csv");
+      parser.parse("test/fixtures/malformed_addresses.csv");
 
   // The record with only 7 fields should be rejected (needs 11)
   // Verify by checking error count includes this case
@@ -126,13 +126,13 @@ TEST(CSVParserTest, ResetCountersOnNewParse) {
   CSVParser parser;
 
   // First parse
-  parser.parse("test/test_data/valid_addresses.csv");
+  parser.parse("test/fixtures/valid_addresses.csv");
   EXPECT_EQ(parser.getSuccessCount(), 5);
   EXPECT_EQ(parser.getErrorCount(), 0);
 
   // Second parse should reset counters
   std::vector<AddressRecord> records =
-      parser.parse("test/test_data/malformed_addresses.csv");
+      parser.parse("test/fixtures/malformed_addresses.csv");
   EXPECT_EQ(parser.getSuccessCount(), 2);
   EXPECT_EQ(parser.getErrorCount(), 5);
 }

@@ -1,4 +1,4 @@
-# Geocoding System - Frontend Test Portal
+# Geocoding System - Web Frontend
 
 A simple, beautiful web interface to test your geocoding system.
 
@@ -19,13 +19,13 @@ Simply open the file in your browser:
 
 ```bash
 # macOS
-open frontend/index.html
+open web/index.html
 
 # Linux
-xdg-open frontend/index.html
+xdg-open web/index.html
 
 # Windows
-start frontend/index.html
+start web/index.html
 ```
 
 ### Option 2: Serve with Python
@@ -34,7 +34,7 @@ For better CORS handling:
 
 ```bash
 # Python 3
-cd frontend
+cd web
 python3 -m http.server 8000
 
 # Then open: http://localhost:8000
@@ -46,8 +46,8 @@ python3 -m http.server 8000
 # Install http-server globally
 npm install -g http-server
 
-# Serve the frontend
-cd frontend
+# Serve the web frontend
+cd web
 http-server -p 8000
 
 # Then open: http://localhost:8000
@@ -169,7 +169,7 @@ cut -d',' -f4 data/shard_0_data_demo.csv | sort -u | head -20
 ```
 ┌─────────────┐
 │   Browser   │
-│  (Frontend) │
+│     (Web)   │
 └──────┬──────┘
        │ HTTP POST /api/findAddress
        │ {"address": "Salinas"}
