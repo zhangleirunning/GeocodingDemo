@@ -4,7 +4,7 @@
 
 RadixTreeIndex::RadixTreeIndex() : root_(std::make_unique<RadixNode>()), term_count_(0) {}
 
-void RadixTreeIndex::insert(const std::string& term, const std::string& address_id) {
+void RadixTreeIndex::insert(const std::string& term, size_t address_id) {
   if (term.empty()) {
     return;
   }
@@ -14,7 +14,7 @@ void RadixTreeIndex::insert(const std::string& term, const std::string& address_
 
 void RadixTreeIndex::insertHelper(RadixNode* node,
                                    const std::string& term,
-                                   const std::string& address_id,
+                                   size_t address_id,
                                    size_t depth) {
   // If we've consumed the entire term, add the address_id to this node
   if (depth >= term.length()) {
@@ -99,8 +99,8 @@ void RadixTreeIndex::insertHelper(RadixNode* node,
             });
 }
 
-std::vector<std::string> RadixTreeIndex::search(const std::string& prefix) const {
-  std::vector<std::string> results;
+std::vector<size_t> RadixTreeIndex::search(const std::string& prefix) const {
+  std::vector<size_t> results;
   if (prefix.empty()) {
     return results;
   }
@@ -110,7 +110,7 @@ std::vector<std::string> RadixTreeIndex::search(const std::string& prefix) const
 
 void RadixTreeIndex::searchHelper(const RadixNode* node,
                                    const std::string& prefix,
-                                   std::vector<std::string>& results,
+                                   std::vector<size_t>& results,
                                    size_t depth) const {
   // If we've matched the entire prefix, collect all IDs from this subtree
   if (depth >= prefix.length()) {
@@ -144,7 +144,7 @@ void RadixTreeIndex::searchHelper(const RadixNode* node,
 }
 
 void RadixTreeIndex::collectAllIds(const RadixNode* node,
-                                    std::vector<std::string>& results) const {
+                                    std::vector<size_t>& results) const {
   // Add all address_ids from this node
   for (const auto& id : node->address_ids) {
     // Avoid duplicates
@@ -170,10 +170,7 @@ size_t RadixTreeIndex::getMemoryUsageHelper(const RadixNode* node) const {
 
   size_t usage = sizeof(RadixNode);
   usage += node->edge_label.capacity();
-  usage += node->address_ids.capacity() * sizeof(std::string);
-  for (const auto& id : node->address_ids) {
-    usage += id.capacity();
-  }
+  usage += node->address_ids.capacity() * sizeof(size_t);
   usage += node->children.capacity() * sizeof(std::unique_ptr<RadixNode>);
 
   for (const auto& child : node->children) {

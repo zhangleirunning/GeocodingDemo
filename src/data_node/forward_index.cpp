@@ -1,10 +1,10 @@
 #include "data_node/forward_index.h"
 
-void ForwardIndex::insert(const std::string& id, const AddressRecord& record) {
+void ForwardIndex::insert(size_t id, const AddressRecord& record) {
   records_[id] = record;
 }
 
-std::optional<AddressRecord> ForwardIndex::get(const std::string& id) const {
+std::optional<AddressRecord> ForwardIndex::get(size_t id) const {
   auto it = records_.find(id);
   if (it != records_.end()) {
     return it->second;
@@ -12,7 +12,7 @@ std::optional<AddressRecord> ForwardIndex::get(const std::string& id) const {
   return std::nullopt;
 }
 
-bool ForwardIndex::contains(const std::string& id) const {
+bool ForwardIndex::contains(size_t id) const {
   return records_.find(id) != records_.end();
 }
 
@@ -24,14 +24,13 @@ size_t ForwardIndex::getStorageSize() const {
 
   // Size of each entry in the map
   for (const auto& [id, record] : records_) {
-    // Size of the key (string)
-    total_size += sizeof(std::string) + id.capacity();
+    // Size of the key (size_t)
+    total_size += sizeof(size_t);
 
     // Size of the AddressRecord
     total_size += sizeof(AddressRecord);
 
     // Size of dynamic string content in AddressRecord
-    total_size += record.hash.capacity();
     total_size += record.number.capacity();
     total_size += record.street.capacity();
     total_size += record.unit.capacity();

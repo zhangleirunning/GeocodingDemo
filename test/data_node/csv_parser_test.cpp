@@ -26,7 +26,7 @@ TEST(CSVParserTest, ParseWellFormedCSV) {
   EXPECT_EQ(records[0].unit, "");
   EXPECT_EQ(records[0].city, "Steilacoom");
   EXPECT_EQ(records[0].postcode, "98388");
-  EXPECT_EQ(records[0].hash, "46a6ea62641c0d1c");
+  EXPECT_EQ(records[0].hash, 0x46a6ea62641c0d1c);
 
   // Verify second record with unit field
   EXPECT_DOUBLE_EQ(records[1].longitude, -121.6461331);
@@ -36,7 +36,7 @@ TEST(CSVParserTest, ParseWellFormedCSV) {
   EXPECT_EQ(records[1].unit, "C");
   EXPECT_EQ(records[1].city, "Salinas");
   EXPECT_EQ(records[1].postcode, "93906");
-  EXPECT_EQ(records[1].hash, "a8ac1dc8c998ce76");
+  EXPECT_EQ(records[1].hash, 0xa8ac1dc8c998ce76);
 }
 
 // Test parsing CSV with empty optional fields

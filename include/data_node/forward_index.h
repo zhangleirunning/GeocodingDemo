@@ -12,13 +12,13 @@ class ForwardIndex {
   ForwardIndex() = default;
 
   // Store an address record
-  void insert(const std::string& id, const AddressRecord& record);
+  void insert(size_t id, const AddressRecord& record);
 
   // Retrieve an address record by ID
-  std::optional<AddressRecord> get(const std::string& id) const;
+  std::optional<AddressRecord> get(size_t id) const;
 
   // Check if an ID exists
-  bool contains(const std::string& id) const;
+  bool contains(size_t id) const;
 
   // Get total storage size (approximate bytes)
   size_t getStorageSize() const;
@@ -27,7 +27,7 @@ class ForwardIndex {
   size_t getRecordCount() const;
 
  private:
-  std::unordered_map<std::string, AddressRecord> records_;
+  std::unordered_map<size_t, AddressRecord> records_;
 };
 
 #endif  // DATA_NODE_FORWARD_INDEX_H_

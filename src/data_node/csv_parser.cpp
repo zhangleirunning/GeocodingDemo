@@ -82,7 +82,13 @@ std::optional<AddressRecord> CSVParser::parseRecord(const std::string& line) {
     // Note: DISTRICT (fields[6]) and REGION (fields[7]) are not stored in AddressRecord
     std::string postcode = fields[8];
     // Note: ID (fields[9]) is not stored in AddressRecord
-    std::string hash = fields[10];
+    std::string hash_str = fields[10];
+
+    // Convert hex string to size_t
+    size_t hash = 0;
+    if (!hash_str.empty()) {
+      hash = std::stoull(hash_str, nullptr, 16);
+    }
 
     // Create AddressRecord with original values
     // Note: normalized values will be set later by the normalizer

@@ -6,17 +6,17 @@ TEST(AddressRecordTest, DefaultConstructor) {
   AddressRecord record;
   EXPECT_EQ(record.longitude, 0.0);
   EXPECT_EQ(record.latitude, 0.0);
-  EXPECT_TRUE(record.hash.empty());
+  EXPECT_EQ(record.hash, 0);
 }
 
 TEST(AddressRecordTest, ParameterizedConstructor) {
-  AddressRecord record(-122.608996, 47.166377, "hash456", "611", "3RD STREET",
+  AddressRecord record(-122.608996, 47.166377, 0x668f4a26abdd476d, "611", "3RD STREET",
                        "APT 5", "STEILACOOM", "98388", "3rd St", "Apt 5",
                        "Steilacoom");
 
   EXPECT_DOUBLE_EQ(record.longitude, -122.608996);
   EXPECT_DOUBLE_EQ(record.latitude, 47.166377);
-  EXPECT_EQ(record.hash, "hash456");
+  EXPECT_EQ(record.hash, 0x668f4a26abdd476d);
   EXPECT_EQ(record.number, "611");
   EXPECT_EQ(record.street, "3RD STREET");
   EXPECT_EQ(record.unit, "APT 5");
@@ -28,11 +28,11 @@ TEST(AddressRecordTest, ParameterizedConstructor) {
 }
 
 TEST(AddressRecordTest, EqualityOperator) {
-  AddressRecord record1(-122.608996, 47.166377, "hash456", "611",
+  AddressRecord record1(-122.608996, 47.166377, 0x668f4a26abdd476d, "611",
                         "3RD STREET", "", "STEILACOOM", "98388", "3rd St", "",
                         "Steilacoom");
 
-  AddressRecord record2(-122.608996, 47.166377, "hash456", "611",
+  AddressRecord record2(-122.608996, 47.166377, 0x668f4a26abdd476d, "611",
                         "3RD STREET", "", "STEILACOOM", "98388", "3rd St", "",
                         "Steilacoom");
 
@@ -40,11 +40,11 @@ TEST(AddressRecordTest, EqualityOperator) {
 }
 
 TEST(AddressRecordTest, InequalityOperator) {
-  AddressRecord record1(-122.608996, 47.166377, "hash456", "611",
+  AddressRecord record1(-122.608996, 47.166377, 0x668f4a26abdd476d, "611",
                         "3RD STREET", "", "STEILACOOM", "98388", "3rd St", "",
                         "Steilacoom");
 
-  AddressRecord record2(-122.608996, 47.166377, "hash789", "611",
+  AddressRecord record2(-122.608996, 47.166377, 0xABCDEF1234567890, "611",
                         "3RD STREET", "", "STEILACOOM", "98388", "3rd St", "",
                         "Steilacoom");
 
@@ -52,12 +52,12 @@ TEST(AddressRecordTest, InequalityOperator) {
 }
 
 TEST(AddressRecordTest, FloatingPointTolerance) {
-  AddressRecord record1(-122.608996, 47.166377, "hash456", "611",
+  AddressRecord record1(-122.608996, 47.166377, 0x668f4a26abdd476d, "611",
                         "3RD STREET", "", "STEILACOOM", "98388", "3rd St", "",
                         "Steilacoom");
 
   // Slightly different coordinates within epsilon tolerance
-  AddressRecord record2(-122.608996 + 1e-10, 47.166377 + 1e-10, "hash456",
+  AddressRecord record2(-122.608996 + 1e-10, 47.166377 + 1e-10, 0x668f4a26abdd476d,
                         "611", "3RD STREET", "", "STEILACOOM", "98388",
                         "3rd St", "", "Steilacoom");
 

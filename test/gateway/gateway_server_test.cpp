@@ -38,7 +38,7 @@ datanode::AddressRecord createTestRecord(
     const std::string& city,
     const std::string& postcode,
     const std::string& unit = "",
-    const std::string& hash = "test_hash",
+    uint64_t hash = 0x1234567890ABCDEF,
     double lon = -122.0,
     double lat = 47.0) {
 
@@ -62,16 +62,16 @@ TEST_F(GatewayServerTest, ResultRankingAlgorithm) {
 
   // Create test records with different characteristics
   datanode::AddressRecord record1 = createTestRecord(
-      "123", "MAIN STREET", "SEATTLE", "98101", "", "hash1");
+      "123", "MAIN STREET", "SEATTLE", "98101", "", 0x0000000000000001);
 
   datanode::AddressRecord record2 = createTestRecord(
-      "456", "MAIN AVENUE", "SEATTLE", "98102", "", "hash2");
+      "456", "MAIN AVENUE", "SEATTLE", "98102", "", 0x0000000000000002);
 
   datanode::AddressRecord record3 = createTestRecord(
-      "789", "OAK STREET", "SEATTLE", "98103", "", "hash3");
+      "789", "OAK STREET", "SEATTLE", "98103", "", 0x0000000000000003);
 
   datanode::AddressRecord record4 = createTestRecord(
-      "321", "PINE STREET", "PORTLAND", "97201", "", "hash4");
+      "321", "PINE STREET", "PORTLAND", "97201", "", 0x0000000000000004);
 
   // Create mock data node results
   std::vector<DataNodeResult> results;
@@ -133,10 +133,10 @@ TEST_F(GatewayServerTest, DuplicateDetection) {
 
   // Create duplicate records (same number, street, city, postcode)
   datanode::AddressRecord record1 = createTestRecord(
-      "123", "MAIN STREET", "SEATTLE", "98101", "APT 1", "hash1");
+      "123", "MAIN STREET", "SEATTLE", "98101", "APT 1", 0x0000000000000001);
 
   datanode::AddressRecord record2 = createTestRecord(
-      "123", "MAIN STREET", "SEATTLE", "98101", "APT 2", "hash2");
+      "123", "MAIN STREET", "SEATTLE", "98101", "APT 2", 0x0000000000000002);
 
   // Create mock data node results with duplicates
   std::vector<DataNodeResult> results;
@@ -331,7 +331,7 @@ TEST_F(GatewayServerTest, MaxResultsLimiting) {
         "SEATTLE",
         "98101",
         "",
-        "hash" + std::to_string(i));
+        0x1000000000000000 + i);
     result_node0.records.push_back(record);
   }
 

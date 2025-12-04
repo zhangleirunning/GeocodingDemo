@@ -2,12 +2,13 @@
 #define DATA_NODE_ADDRESS_RECORD_H_
 
 #include <cmath>
+#include <cstddef>
 #include <string>
 
 struct AddressRecord {
   double longitude;
   double latitude;
-  std::string hash;
+  size_t hash;
   std::string number;
   std::string street;
   std::string unit;
@@ -20,12 +21,12 @@ struct AddressRecord {
   std::string original_city;
 
   // Default constructor
-  AddressRecord() : longitude(0.0), latitude(0.0) {}
+  AddressRecord() : longitude(0.0), latitude(0.0), hash(0) {}
 
   // Constructor with all fields
   AddressRecord(double longitude_,
                 double latitude_,
-                const std::string& hash_,
+                size_t hash_,
                 const std::string& number_,
                 const std::string& street_,
                 const std::string& unit_,

@@ -146,7 +146,7 @@ datanode::AddressRecord createTestRecord(
     const std::string& city,
     const std::string& postcode,
     const std::string& unit = "",
-    const std::string& hash = "test_hash",
+    uint64_t hash = 0x1234567890ABCDEF,
     double lon = -122.0,
     double lat = 47.0) {
 
@@ -211,15 +211,15 @@ TEST_F(GatewayIntegrationTest, EndToEndSuccessfulQuery) {
   // Configure mock node 0 to return results
   std::vector<datanode::AddressRecord> node0_results;
   node0_results.push_back(createTestRecord(
-      "123", "MAIN STREET", "SEATTLE", "98101", "", "hash1"));
+      "123", "MAIN STREET", "SEATTLE", "98101", "", 0x0000000000000001));
   node0_results.push_back(createTestRecord(
-      "456", "MAIN AVENUE", "SEATTLE", "98102", "", "hash2"));
+      "456", "MAIN AVENUE", "SEATTLE", "98102", "", 0x0000000000000002));
   mock_node0_->getService().setSearchResults(node0_results);
 
   // Configure mock node 1 to return results
   std::vector<datanode::AddressRecord> node1_results;
   node1_results.push_back(createTestRecord(
-      "789", "OAK STREET", "SEATTLE", "98103", "", "hash3"));
+      "789", "OAK STREET", "SEATTLE", "98103", "", 0x0000000000000003));
   mock_node1_->getService().setSearchResults(node1_results);
 
   // Create and initialize gateway
@@ -545,7 +545,7 @@ TEST_F(GatewayIntegrationTest, LargeResultSet) {
   for (int i = 0; i < 10; i++) {
     node0_results.push_back(createTestRecord(
         std::to_string(100 + i), "MAIN STREET", "SEATTLE",
-        "98101", "", "hash0_" + std::to_string(i)));
+        "98101", "", 0x1000000000000000 + i));
   }
   mock_node0_->getService().setSearchResults(node0_results);
 
@@ -554,7 +554,7 @@ TEST_F(GatewayIntegrationTest, LargeResultSet) {
   for (int i = 0; i < 10; i++) {
     node1_results.push_back(createTestRecord(
         std::to_string(200 + i), "MAIN AVENUE", "SEATTLE",
-        "98102", "", "hash1_" + std::to_string(i)));
+        "98102", "", 0x2000000000000000 + i));
   }
   mock_node1_->getService().setSearchResults(node1_results);
 

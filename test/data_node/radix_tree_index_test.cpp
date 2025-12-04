@@ -9,10 +9,10 @@ TEST(RadixTreeIndexTest, BasicInsertAndSearch) {
   RadixTreeIndex index;
 
   // Insert some terms
-  index.insert("STREET", "id1");
-  index.insert("STREET", "id2");
-  index.insert("STREAM", "id3");
-  index.insert("STRONG", "id4");
+  index.insert("STREET", 1);
+  index.insert("STREET", 2);
+  index.insert("STREAM", 3);
+  index.insert("STRONG", 4);
 
   // Search for exact match
   auto results = index.search("STREET");
@@ -29,7 +29,7 @@ TEST(RadixTreeIndexTest, BasicInsertAndSearch) {
 
 TEST(RadixTreeIndexTest, EmptySearchReturnsEmpty) {
   RadixTreeIndex index;
-  index.insert("TEST", "id1");
+  index.insert("TEST", 1);
 
   auto results = index.search("");
   EXPECT_EQ(results.size(), 0);
@@ -37,7 +37,7 @@ TEST(RadixTreeIndexTest, EmptySearchReturnsEmpty) {
 
 TEST(RadixTreeIndexTest, EmptyInsertIgnored) {
   RadixTreeIndex index;
-  index.insert("", "id1");
+  index.insert("", 1);
 
   EXPECT_EQ(index.getTermCount(), 0);
 }
@@ -46,7 +46,7 @@ TEST(RadixTreeIndexTest, GetMemoryUsage) {
   RadixTreeIndex index;
   size_t initial_usage = index.getMemoryUsage();
 
-  index.insert("TEST", "id1");
+  index.insert("TEST", 1);
   size_t after_insert = index.getMemoryUsage();
 
   EXPECT_GT(after_insert, initial_usage);
@@ -56,14 +56,14 @@ TEST(RadixTreeIndexTest, GetTermCount) {
   RadixTreeIndex index;
   EXPECT_EQ(index.getTermCount(), 0);
 
-  index.insert("TERM1", "id1");
+  index.insert("TERM1", 1);
   EXPECT_EQ(index.getTermCount(), 1);
 
-  index.insert("TERM2", "id2");
+  index.insert("TERM2", 2);
   EXPECT_EQ(index.getTermCount(), 2);
 
   // Inserting same term with different ID should still increment count
-  index.insert("TERM1", "id3");
+  index.insert("TERM1", 3);
   EXPECT_EQ(index.getTermCount(), 3);
 }
 
@@ -73,22 +73,22 @@ TEST(RadixTreeIndexTest, InsertAndSearchSingleTerm) {
   RadixTreeIndex index;
 
   // Insert a single term with one ID
-  index.insert("MAIN", "addr_001");
+  index.insert("MAIN", 0x1234567890ABCDEF);
 
   // Search for the exact term
   auto results = index.search("MAIN");
   ASSERT_EQ(results.size(), 1);
-  EXPECT_EQ(results[0], "addr_001");
+  EXPECT_EQ(results[0], 0x1234567890ABCDEF);
 
   // Search for a prefix of the term
   results = index.search("MA");
   ASSERT_EQ(results.size(), 1);
-  EXPECT_EQ(results[0], "addr_001");
+  EXPECT_EQ(results[0], 0x1234567890ABCDEF);
 
   // Search for the full term as prefix
   results = index.search("MAIN");
   ASSERT_EQ(results.size(), 1);
-  EXPECT_EQ(results[0], "addr_001");
+  EXPECT_EQ(results[0], 0x1234567890ABCDEF);
 
   // Search for non-matching prefix
   results = index.search("SIDE");
@@ -101,32 +101,32 @@ TEST(RadixTreeIndexTest, PrefixSearchMultipleMatches) {
   RadixTreeIndex index;
 
   // Insert multiple terms that share a common prefix
-  index.insert("MAIN", "addr_001");
-  index.insert("MAPLE", "addr_002");
-  index.insert("MARKET", "addr_003");
-  index.insert("MADISON", "addr_004");
-  index.insert("BROAD", "addr_005");  // Different prefix
+  index.insert("MAIN", 0x1111111111111111);
+  index.insert("MAPLE", 0x2222222222222222);
+  index.insert("MARKET", 0x3333333333333333);
+  index.insert("MADISON", 0x4444444444444444);
+  index.insert("BROAD", 0x5555555555555555);  // Different prefix
 
   // Search for common prefix "MA" - should match MAIN, MAPLE, MARKET, MADISON
   auto results = index.search("MA");
   EXPECT_EQ(results.size(), 4);
   // Results should contain all four IDs
-  EXPECT_NE(std::find(results.begin(), results.end(), "addr_001"), results.end());
-  EXPECT_NE(std::find(results.begin(), results.end(), "addr_002"), results.end());
-  EXPECT_NE(std::find(results.begin(), results.end(), "addr_003"), results.end());
-  EXPECT_NE(std::find(results.begin(), results.end(), "addr_004"), results.end());
+  EXPECT_NE(std::find(results.begin(), results.end(), 0x1111111111111111), results.end());
+  EXPECT_NE(std::find(results.begin(), results.end(), 0x2222222222222222), results.end());
+  EXPECT_NE(std::find(results.begin(), results.end(), 0x3333333333333333), results.end());
+  EXPECT_NE(std::find(results.begin(), results.end(), 0x4444444444444444), results.end());
   // Should not contain BROAD
-  EXPECT_EQ(std::find(results.begin(), results.end(), "addr_005"), results.end());
+  EXPECT_EQ(std::find(results.begin(), results.end(), 0x5555555555555555), results.end());
 
   // Search for more specific prefix "MAR" - should match MARKET only
   results = index.search("MAR");
   EXPECT_EQ(results.size(), 1);
-  EXPECT_EQ(results[0], "addr_003");
+  EXPECT_EQ(results[0], 0x3333333333333333);
 
   // Search for prefix "B" - should match BROAD only
   results = index.search("B");
   EXPECT_EQ(results.size(), 1);
-  EXPECT_EQ(results[0], "addr_005");
+  EXPECT_EQ(results[0], 0x5555555555555555);
 
   // Search for prefix "M" - should match all MA* terms
   results = index.search("M");
@@ -139,30 +139,30 @@ TEST(RadixTreeIndexTest, DuplicateTermHandling) {
   RadixTreeIndex index;
 
   // Insert the same term with multiple different IDs
-  index.insert("STREET", "addr_100");
-  index.insert("STREET", "addr_200");
-  index.insert("STREET", "addr_300");
+  index.insert("STREET", 0xAAAAAAAAAAAAAAAA);
+  index.insert("STREET", 0xBBBBBBBBBBBBBBBB);
+  index.insert("STREET", 0xCCCCCCCCCCCCCCCC);
 
   // Search should return all IDs associated with the term
   auto results = index.search("STREET");
   EXPECT_EQ(results.size(), 3);
-  EXPECT_NE(std::find(results.begin(), results.end(), "addr_100"), results.end());
-  EXPECT_NE(std::find(results.begin(), results.end(), "addr_200"), results.end());
-  EXPECT_NE(std::find(results.begin(), results.end(), "addr_300"), results.end());
+  EXPECT_NE(std::find(results.begin(), results.end(), 0xAAAAAAAAAAAAAAAA), results.end());
+  EXPECT_NE(std::find(results.begin(), results.end(), 0xBBBBBBBBBBBBBBBB), results.end());
+  EXPECT_NE(std::find(results.begin(), results.end(), 0xCCCCCCCCCCCCCCCC), results.end());
 
   // Prefix search should also return all IDs
   results = index.search("STR");
   EXPECT_EQ(results.size(), 3);
 
   // Insert the same term-ID pair again (duplicate)
-  index.insert("STREET", "addr_100");
+  index.insert("STREET", 0xAAAAAAAAAAAAAAAA);
 
   // Should still have 3 unique IDs (no duplicate IDs)
   results = index.search("STREET");
   EXPECT_EQ(results.size(), 3);
 
   // Add another unique ID
-  index.insert("STREET", "addr_400");
+  index.insert("STREET", 0xDDDDDDDDDDDDDDDD);
   results = index.search("STREET");
   EXPECT_EQ(results.size(), 4);
 }
@@ -173,11 +173,11 @@ TEST(RadixTreeIndexTest, DuplicateTermsWithPrefixSearch) {
   RadixTreeIndex index;
 
   // Insert multiple terms, some duplicates
-  index.insert("PARK", "addr_001");
-  index.insert("PARK", "addr_002");
-  index.insert("PARKER", "addr_003");
-  index.insert("PARKING", "addr_004");
-  index.insert("PARK", "addr_005");
+  index.insert("PARK", 0x0000000000000001);
+  index.insert("PARK", 0x0000000000000002);
+  index.insert("PARKER", 0x0000000000000003);
+  index.insert("PARKING", 0x0000000000000004);
+  index.insert("PARK", 0x0000000000000005);
 
   // Search for exact term "PARK" - should return 3 IDs
   auto results = index.search("PARK");
@@ -186,12 +186,12 @@ TEST(RadixTreeIndexTest, DuplicateTermsWithPrefixSearch) {
   // Search for "PARKER" - should return 1 ID
   results = index.search("PARKER");
   EXPECT_EQ(results.size(), 1);
-  EXPECT_EQ(results[0], "addr_003");
+  EXPECT_EQ(results[0], 0x0000000000000003);
 
   // Search for "PARKING" - should return 1 ID
   results = index.search("PARKING");
   EXPECT_EQ(results.size(), 1);
-  EXPECT_EQ(results[0], "addr_004");
+  EXPECT_EQ(results[0], 0x0000000000000004);
 
   // Search for prefix "PAR" - should return all 5 IDs
   results = index.search("PAR");

@@ -75,11 +75,9 @@ void DataNode::buildIndexes(const std::vector<AddressRecord>& records) {
   std::cout << "[INFO] [DataNode] Building indexes for " << records.size()
             << " records..." << std::endl;
 
-  for (size_t i = 0; i < records.size(); ++i) {
-    const AddressRecord& record = records[i];
-
-    // Generate a unique ID for this record (using index as ID)
-    std::string record_id = std::to_string(i);
+  for (const AddressRecord& record : records) {
+    // Use the hash field as the unique ID
+    size_t record_id = record.hash;
 
     // Insert into ForwardIndex
     forward_index_->insert(record_id, record);
@@ -108,7 +106,7 @@ void DataNode::buildIndexes(const std::vector<AddressRecord>& records) {
   std::cout << "[INFO] [DataNode] Indexes built successfully" << std::endl;
 }
 
-std::vector<std::string> DataNode::findMatchingIds(
+std::vector<size_t> DataNode::findMatchingIds(
     const std::vector<std::string>& query_terms) {
   if (query_terms.empty()) {
     return {};
@@ -121,7 +119,7 @@ std::vector<std::string> DataNode::findMatchingIds(
   }
 
   // Find IDs matching the first term
-  std::vector<std::string> first_term_ids =
+  std::vector<size_t> first_term_ids =
       radix_index_->search(normalized_terms[0]);
 
   if (first_term_ids.empty() || normalized_terms.size() == 1) {
@@ -129,18 +127,18 @@ std::vector<std::string> DataNode::findMatchingIds(
   }
 
   // Convert to set for efficient intersection
-  std::unordered_set<std::string> result_ids(first_term_ids.begin(),
-                                              first_term_ids.end());
+  std::unordered_set<size_t> result_ids(first_term_ids.begin(),
+                                         first_term_ids.end());
 
   // Intersect with results from remaining terms
   for (size_t i = 1; i < normalized_terms.size(); ++i) {
-    std::vector<std::string> term_ids =
+    std::vector<size_t> term_ids =
         radix_index_->search(normalized_terms[i]);
-    std::unordered_set<std::string> term_id_set(term_ids.begin(),
-                                                 term_ids.end());
+    std::unordered_set<size_t> term_id_set(term_ids.begin(),
+                                            term_ids.end());
 
     // Keep only IDs that appear in both sets
-    std::unordered_set<std::string> intersection;
+    std::unordered_set<size_t> intersection;
     for (const auto& id : result_ids) {
       if (term_id_set.count(id) > 0) {
         intersection.insert(id);
@@ -155,7 +153,7 @@ std::vector<std::string> DataNode::findMatchingIds(
   }
 
   // Convert back to vector
-  return std::vector<std::string>(result_ids.begin(), result_ids.end());
+  return std::vector<size_t>(result_ids.begin(), result_ids.end());
 }
 
 std::vector<AddressRecord> DataNode::search(
@@ -171,7 +169,7 @@ std::vector<AddressRecord> DataNode::search(
     }
 
     // Find matching IDs using RadixTreeIndex
-    std::vector<std::string> matching_ids = findMatchingIds(query_terms);
+    std::vector<size_t> matching_ids = findMatchingIds(query_terms);
 
     std::cout << "[INFO] [DataNode] Found " << matching_ids.size()
               << " matching IDs" << std::endl;

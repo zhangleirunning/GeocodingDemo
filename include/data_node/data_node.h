@@ -44,7 +44,7 @@ class DataNode {
   Statistics stats_;
 
   void buildIndexes(const std::vector<AddressRecord>& records);
-  std::vector<std::string> findMatchingIds(
+  std::vector<size_t> findMatchingIds(
       const std::vector<std::string>& query_terms);
 };
 
