@@ -130,49 +130,42 @@ void GatewayServer::setupRoutes() {
           std::cout << "[INFO] Received findAddress request: \""
                     << address_keyword << "\"" << std::endl;
 
-          // Split address keyword into terms (by whitespace)
-          std::vector<std::string> raw_terms;
-          std::istringstream iss(address_keyword);
-          std::string term;
-          while (iss >> term) {
-            raw_terms.push_back(term);
+          std::vector<std::string> query_terms;
+
+          // Check if this is a structured address query (contains comma)
+          if (address_keyword.find(',') != std::string::npos) {
+            // Structured address query - pass as single term to preserve structure
+            // The DataNode will parse it into components
+            std::cout << "[INFO] Detected structured address query" << std::endl;
+            query_terms.push_back(address_keyword);
+          } else {
+            // Traditional multi-term query - split by whitespace
+            std::cout << "[INFO] Detected traditional multi-term query" << std::endl;
+            std::istringstream iss(address_keyword);
+            std::string term;
+            while (iss >> term) {
+              query_terms.push_back(term);
+            }
           }
 
-          if (raw_terms.empty()) {
+          if (query_terms.empty()) {
             crow::json::wvalue error_response;
             error_response["error"] =
                 "Address keyword must contain at least one term";
             return crow::response(400, error_response);
           }
 
-          // Normalize search terms
-          AddressNormalizer normalizer;
-          std::vector<std::string> normalized_terms;
-          for (const auto& raw_term : raw_terms) {
-            std::string normalized = normalizer.normalize(raw_term);
-            if (!normalized.empty()) {
-              normalized_terms.push_back(normalized);
-            }
-          }
-
-          if (normalized_terms.empty()) {
-            crow::json::wvalue error_response;
-            error_response["error"] =
-                "No valid search terms after normalization";
-            return crow::response(400, error_response);
-          }
-
-          std::cout << "[INFO] Normalized search terms: ";
-          for (size_t i = 0; i < normalized_terms.size(); ++i) {
-            std::cout << "\"" << normalized_terms[i] << "\"";
-            if (i < normalized_terms.size() - 1) {
+          std::cout << "[INFO] Query terms: ";
+          for (size_t i = 0; i < query_terms.size(); ++i) {
+            std::cout << "\"" << query_terms[i] << "\"";
+            if (i < query_terms.size() - 1) {
               std::cout << ", ";
             }
           }
           std::cout << std::endl;
 
           // Query all data nodes
-          auto results = queryAllDataNodes(normalized_terms);
+          auto results = queryAllDataNodes(query_terms);
 
           // Count successful and failed nodes
           int successful_nodes = 0;
@@ -188,18 +181,18 @@ void GatewayServer::setupRoutes() {
           }
 
           // Aggregate and rank results (top 5)
-          auto ranked_results = aggregateAndRankResults(results, normalized_terms, 5);
+          auto ranked_results = aggregateAndRankResults(results, query_terms, 5);
 
           // Build JSON response
           crow::json::wvalue response;
           response["query"] = address_keyword;
 
-          // Build normalized_terms array
+          // Build query_terms array
           std::vector<crow::json::wvalue> terms_array;
-          for (const auto& term : normalized_terms) {
+          for (const auto& term : query_terms) {
             terms_array.push_back(term);
           }
-          response["normalized_terms"] = std::move(terms_array);
+          response["query_terms"] = std::move(terms_array);
 
           // Build results array with ranked records
           std::vector<crow::json::wvalue> results_array;

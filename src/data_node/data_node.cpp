@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <sstream>
 #include <unordered_set>
 
 #include "data_node/address_normalizer.h"
@@ -71,6 +72,112 @@ bool DataNode::initialize() {
   }
 }
 
+std::vector<std::string> DataNode::generateSearchKeys(const AddressRecord& record) {
+  std::vector<std::string> keys;
+
+  // Normalize all components
+  std::string norm_number = normalizer_->normalize(record.number);
+  std::string norm_street = normalizer_->normalize(record.street);
+  std::string norm_city = normalizer_->normalize(record.city);
+  std::string norm_postcode = normalizer_->normalize(record.postcode);
+
+  // Generate composite keys with different combinations
+  // Key 1: number + separator + street + separator + city
+  if (!norm_number.empty() && !norm_street.empty() && !norm_city.empty()) {
+    std::string key1 = norm_number + KEY_SEPARATOR + norm_street + KEY_SEPARATOR + norm_city;
+    keys.push_back(key1);
+  }
+
+  // Key 2: number + separator + street
+  if (!norm_number.empty() && !norm_street.empty()) {
+    std::string key2 = norm_number + KEY_SEPARATOR + norm_street;
+    keys.push_back(key2);
+  }
+
+  // Key 3: number + separator + street + separator + city + separator + postcode
+  if (!norm_number.empty() && !norm_street.empty() && !norm_city.empty() && !norm_postcode.empty()) {
+    std::string key3 = norm_number + KEY_SEPARATOR + norm_street + KEY_SEPARATOR +
+                       norm_city + KEY_SEPARATOR + norm_postcode;
+    keys.push_back(key3);
+  }
+
+  return keys;
+}
+
+DataNode::ParsedAddress DataNode::parseQuery(const std::string& query) {
+  ParsedAddress parsed;
+
+  // Simple parser: split by comma and whitespace
+  // Expected format: "number street, city, postcode" or variations
+  std::vector<std::string> parts;
+  std::string current;
+
+  for (char c : query) {
+    if (c == ',') {
+      if (!current.empty()) {
+        parts.push_back(current);
+        current.clear();
+      }
+    } else {
+      current += c;
+    }
+  }
+  if (!current.empty()) {
+    parts.push_back(current);
+  }
+
+  // Trim whitespace from parts
+  for (auto& part : parts) {
+    // Trim leading whitespace
+    size_t start = 0;
+    while (start < part.length() && std::isspace(static_cast<unsigned char>(part[start]))) {
+      start++;
+    }
+    // Trim trailing whitespace
+    size_t end = part.length();
+    while (end > start && std::isspace(static_cast<unsigned char>(part[end - 1]))) {
+      end--;
+    }
+    part = part.substr(start, end - start);
+  }
+
+  // Parse based on number of parts
+  if (parts.size() >= 1) {
+    // First part should contain number and street
+    std::string first_part = parts[0];
+    std::istringstream iss(first_part);
+    std::string token;
+    std::vector<std::string> tokens;
+
+    while (iss >> token) {
+      tokens.push_back(token);
+    }
+
+    // First token is likely the number
+    if (!tokens.empty()) {
+      parsed.number = tokens[0];
+
+      // Rest is the street
+      if (tokens.size() > 1) {
+        for (size_t i = 1; i < tokens.size(); ++i) {
+          if (i > 1) parsed.street += " ";
+          parsed.street += tokens[i];
+        }
+      }
+    }
+  }
+
+  if (parts.size() >= 2) {
+    parsed.city = parts[1];
+  }
+
+  if (parts.size() >= 3) {
+    parsed.postcode = parts[2];
+  }
+
+  return parsed;
+}
+
 void DataNode::buildIndexes(const std::vector<AddressRecord>& records) {
   std::cout << "[INFO] [DataNode] Building indexes for " << records.size()
             << " records..." << std::endl;
@@ -82,8 +189,14 @@ void DataNode::buildIndexes(const std::vector<AddressRecord>& records) {
     // Insert into ForwardIndex
     forward_index_->insert(record_id, record);
 
-    // Insert normalized searchable fields into RadixTreeIndex
-    // Only insert non-empty fields
+    // Generate and insert composite search keys for structured queries
+    std::vector<std::string> search_keys = generateSearchKeys(record);
+    for (const auto& key : search_keys) {
+      radix_index_->insert(key, record_id);
+    }
+
+    // Also index individual fields for backward compatibility and partial matching
+    // This allows searching by individual terms like "STREET" or "SEATTLE"
     if (!record.street.empty()) {
       std::string normalized_street = normalizer_->normalize(record.street);
       radix_index_->insert(normalized_street, record_id);
@@ -99,8 +212,10 @@ void DataNode::buildIndexes(const std::vector<AddressRecord>& records) {
       radix_index_->insert(normalized_postcode, record_id);
     }
 
-    // Note: The current AddressRecord doesn't have district and region fields
-    // as shown in the design document, so we skip those
+    if (!record.number.empty()) {
+      std::string normalized_number = normalizer_->normalize(record.number);
+      radix_index_->insert(normalized_number, record_id);
+    }
   }
 
   std::cout << "[INFO] [DataNode] Indexes built successfully" << std::endl;
@@ -112,6 +227,55 @@ std::vector<size_t> DataNode::findMatchingIds(
     return {};
   }
 
+  // Check if this is a single query string that looks like a full address
+  // (contains comma, suggesting it's a structured address query)
+  if (query_terms.size() == 1 && query_terms[0].find(',') != std::string::npos) {
+    // Parse the query as a structured address
+    ParsedAddress parsed = parseQuery(query_terms[0]);
+
+    // Generate search keys from the parsed address
+    std::vector<std::string> search_keys;
+
+    // Normalize components
+    std::string norm_number = normalizer_->normalize(parsed.number);
+    std::string norm_street = normalizer_->normalize(parsed.street);
+    std::string norm_city = normalizer_->normalize(parsed.city);
+    std::string norm_postcode = normalizer_->normalize(parsed.postcode);
+
+    // Try most specific key first (with postcode)
+    if (!norm_number.empty() && !norm_street.empty() && !norm_city.empty() && !norm_postcode.empty()) {
+      std::string key = norm_number + KEY_SEPARATOR + norm_street + KEY_SEPARATOR +
+                       norm_city + KEY_SEPARATOR + norm_postcode;
+      search_keys.push_back(key);
+    }
+
+    // Try key with city
+    if (!norm_number.empty() && !norm_street.empty() && !norm_city.empty()) {
+      std::string key = norm_number + KEY_SEPARATOR + norm_street + KEY_SEPARATOR + norm_city;
+      search_keys.push_back(key);
+    }
+
+    // Try key without city
+    if (!norm_number.empty() && !norm_street.empty()) {
+      std::string key = norm_number + KEY_SEPARATOR + norm_street;
+      search_keys.push_back(key);
+    }
+
+    // Search with each key and return first match
+    for (const auto& key : search_keys) {
+      std::vector<size_t> results = radix_index_->search(key);
+      if (!results.empty()) {
+        std::cout << "[INFO] [DataNode] Found " << results.size()
+                  << " matches using key: " << key << std::endl;
+        return results;
+      }
+    }
+
+    // No matches found with composite keys
+    return {};
+  }
+
+  // Original logic for multi-term queries
   // Normalize query terms
   std::vector<std::string> normalized_terms;
   for (const auto& term : query_terms) {

@@ -43,9 +43,24 @@ class DataNode {
 
   Statistics stats_;
 
+  // Separator for composite keys
+  static constexpr char KEY_SEPARATOR = '\x01';
+
   void buildIndexes(const std::vector<AddressRecord>& records);
   std::vector<size_t> findMatchingIds(
       const std::vector<std::string>& query_terms);
+
+  // Generate search keys for an address record
+  std::vector<std::string> generateSearchKeys(const AddressRecord& record);
+
+  // Parse a query string into address components
+  struct ParsedAddress {
+    std::string number;
+    std::string street;
+    std::string city;
+    std::string postcode;
+  };
+  ParsedAddress parseQuery(const std::string& query);
 };
 
 #endif  // DATA_NODE_DATA_NODE_H_
