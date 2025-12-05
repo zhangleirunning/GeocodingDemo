@@ -186,9 +186,9 @@ pre-commit run --all-files
 
 ## Related Documentation
 
-- [Style Guide](STYLE_GUIDE.md) - Code style rules
-- [Quick Style Reference](QUICK_STYLE_REFERENCE.md) - Quick lookup
-- [Style Setup](STYLE_SETUP_SUMMARY.md) - Setting up tools
+- [Style Guide](STYLE_GUIDE.md) - Code style rules and enforcement
+- [Quick Style Reference](QUICK_STYLE_REFERENCE.md) - Quick lookup guide
+- [Style Setup Summary](STYLE_SETUP_SUMMARY.md) - Setting up formatting tools
 
 ## Common Questions
 

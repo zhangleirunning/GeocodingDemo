@@ -24,8 +24,8 @@ Updated `CMakeLists.txt` with two new targets:
 
 ### 4. Documentation
 
-- **`docs/STYLE_GUIDE.md`** - Comprehensive style guide with installation and usage
-- **`docs/QUICK_STYLE_REFERENCE.md`** - Quick reference for daily use
+- **`docs/development/STYLE_GUIDE.md`** - Comprehensive style guide with installation and usage
+- **`docs/development/QUICK_STYLE_REFERENCE.md`** - Quick reference for daily use
 - **`README.md`** - Updated with style guide information
 
 ## How to Use
@@ -161,10 +161,10 @@ struct AddressRecord {
 
 ## Resources
 
-- **Quick Reference**: [docs/QUICK_STYLE_REFERENCE.md](docs/QUICK_STYLE_REFERENCE.md)
-- **Full Guide**: [docs/STYLE_GUIDE.md](docs/STYLE_GUIDE.md)
+- **Quick Reference**: [QUICK_STYLE_REFERENCE.md](QUICK_STYLE_REFERENCE.md)
+- **Full Guide**: [STYLE_GUIDE.md](STYLE_GUIDE.md)
 - **Google C++ Style Guide**: https://google.github.io/styleguide/cppguide.html
 
 ## Questions?
 
-See the documentation in `docs/` or refer to the official Google C++ Style Guide.
+See the documentation in `docs/development/` or refer to the official Google C++ Style Guide.

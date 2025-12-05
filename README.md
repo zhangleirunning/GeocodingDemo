@@ -1,16 +1,87 @@
-# Geocoding System - Data Nodes
+# Geocoding System
 
 A distributed geocoding system with data nodes that provide efficient address search capabilities using RadixTree and ForwardIndex structures.
 
+## ✨ Features
+
+- **Distributed Architecture** - Horizontally scalable with sharded data nodes
+- **Fast Search** - RadixTree-based prefix matching with relevance ranking
+- **REST API** - Simple HTTP API for address search
+- **Web Interface** - Beautiful, responsive web UI with Google Maps integration
+- **Docker Support** - Easy deployment with Docker Compose
+- **High Performance** - C++17 implementation with gRPC communication
+- **Comprehensive Testing** - Unit tests, property tests, and integration tests
+
+## 🚀 Quick Start
+
+```bash
+# Start all services with Docker Compose
+docker-compose up --build
+
+# Test the API
+curl -X POST http://localhost:18080/api/findAddress \
+  -H "Content-Type: application/json" \
+  -d '{"address": "Salinas"}'
+
+# Open web interface
+open http://localhost:18080/
+```
+
+See [Testing Guide](docs/development/TESTING_GUIDE.md) for more examples.
+
+## 📚 Documentation
+
+Comprehensive documentation is available in the [docs/](docs/) directory:
+
+- **[Architecture Overview](docs/architecture/OVERVIEW.md)** - System design and components
+- **[REST API](docs/api/REST_API.md)** - Complete API documentation
+- **[Testing Guide](docs/development/TESTING_GUIDE.md)** - How to test the system
+- **[Docker Guide](docs/deployment/DOCKER_BUILD_GUIDE.md)** - Docker deployment details
+- **[Style Guide](docs/development/STYLE_GUIDE.md)** - Code style and formatting
+
+## 📁 Project Structure
+
+```
+.
+├── apps/                    # Application entry points
+│   ├── data_node/          # Data node server application
+│   ├── gateway/            # Gateway server application
+│   └── tools/              # Utility tools
+├── data/                   # Sample data files
+├── docker/                 # Docker configuration
+│   ├── Dockerfile
+│   ├── docker-compose.yml
+│   └── entrypoint.sh
+├── docs/                   # Documentation
+│   ├── api/               # API documentation
+│   ├── architecture/      # System architecture
+│   ├── deployment/        # Deployment guides
+│   └── development/       # Development guides
+├── include/               # Header files
+│   ├── data_node/        # Data node headers
+│   └── gateway/          # Gateway headers
+├── proto/                # Protocol buffer definitions
+├── scripts/              # Build and utility scripts
+├── src/                  # Source code
+│   ├── data_node/       # Data node implementation
+│   └── gateway/         # Gateway implementation
+├── test/                 # Test files
+│   ├── data_node/       # Data node tests
+│   ├── gateway/         # Gateway tests
+│   └── fixtures/        # Test data
+├── web/                  # Web frontend
+└── CMakeLists.txt       # Build configuration
+```
+
 ## Code Style
 
-This project follows the **Google C++ Style Guide**. See [docs/STYLE_GUIDE.md](docs/STYLE_GUIDE.md) for detailed information.
+This project follows the **Google C++ Style Guide**. See [docs/development/STYLE_GUIDE.md](docs/development/STYLE_GUIDE.md) for detailed information.
 
 ## Option 1: Run with Docker Compose (Recommended)
 
 The easiest way to run the complete system is using Docker Compose, which starts both data nodes and the gateway automatically.
 
-> **⏱️ Note**: The first build takes 5-10 minutes as it compiles C++ dependencies (gRPC, Protobuf, etc.). Subsequent builds are much faster (~30-60 seconds) thanks to Docker layer caching. See [DOCKER_BUILD_GUIDE.md](DOCKER_BUILD_GUIDE.md) for optimization tips.
+> **⏱️ Note**: The first build takes 5-10 minutes as it compiles C++ dependencies (gRPC, Protobuf, etc.). Subsequent builds are much faster (~30-60 seconds) thanks to Docker layer caching. See [docs/deployment/DOCKER_BUILD_GUIDE.md](docs/deployment/DOCKER_BUILD_GUIDE.md) for optimization tips.
 
 ### Start All Services
 
@@ -250,4 +321,22 @@ cmake --build build
 ./build/tests --gtest_filter="AddressRecordTest.*"
 ```
 
-For more details on code style enforcement, see [docs/STYLE_GUIDE.md](docs/STYLE_GUIDE.md).
+For more details on code style enforcement, see [docs/development/STYLE_GUIDE.md](docs/development/STYLE_GUIDE.md).
+
+## 🤝 Contributing
+
+1. Follow the [Google C++ Style Guide](docs/development/STYLE_GUIDE.md)
+2. Write tests for new features
+3. Format code before committing: `./scripts/format_code.sh`
+4. Ensure all tests pass: `./build/tests`
+
+## 📄 License
+
+This project is part of a geocoding system implementation.
+
+## 🔗 Resources
+
+- [Architecture Documentation](docs/architecture/OVERVIEW.md)
+- [API Documentation](docs/api/REST_API.md)
+- [Docker Deployment](docs/deployment/DOCKER_BUILD_GUIDE.md)
+- [Testing Guide](docs/development/TESTING_GUIDE.md)

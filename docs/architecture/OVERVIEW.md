@@ -227,7 +227,8 @@ The Geocoding System is a distributed address search service built with C++17, d
 
 ## Related Documentation
 
-- [Data Node Architecture](DATA_NODE.md)
-- [Gateway Architecture](GATEWAY.md)
-- [API Documentation](../api/REST_API.md)
-- [Deployment Guide](../deployment/DOCKER_BUILD_GUIDE.md)
+- [Data Node Architecture](DATA_NODE.md) *(coming soon)*
+- [Gateway Architecture](GATEWAY.md) *(coming soon)*
+- [REST API Documentation](../api/REST_API.md)
+- [Docker Deployment Guide](../deployment/DOCKER_BUILD_GUIDE.md)
+- [Testing Guide](../development/TESTING_GUIDE.md)

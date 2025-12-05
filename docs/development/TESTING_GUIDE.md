@@ -1,8 +1,49 @@
-# Testing Your Geocoding System
+# Testing Guide
 
-## ✅ Your System is Working!
+This guide covers testing the geocoding system, including unit tests, integration tests, and API testing.
 
-The system is running correctly. The issue was searching for addresses that don't exist in your demo data.
+## Table of Contents
+
+1. [Running Unit Tests](#running-unit-tests)
+2. [Testing with Docker](#testing-with-docker)
+3. [API Testing](#api-testing)
+4. [Understanding Your Data](#understanding-your-data)
+5. [Performance Testing](#performance-testing)
+
+## Running Unit Tests
+
+### Build and Run Tests
+
+```bash
+# Build the project with tests
+mkdir -p build
+cd build
+cmake .. -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake
+make
+
+# Run all tests
+./tests
+
+# Run specific test suite
+./tests --gtest_filter="AddressRecordTest.*"
+./tests --gtest_filter="RadixTreeTest.*"
+
+# Run with verbose output
+./tests --gtest_verbose
+```
+
+### Test Coverage
+
+The project includes:
+- **Unit tests** - Testing individual components (RadixTree, ForwardIndex, CSV Parser)
+- **Property tests** - Using RapidCheck for property-based testing
+- **Integration tests** - Testing component interactions
+
+## Testing with Docker
+
+### ✅ Your System is Working!
+
+The system is running correctly. Make sure to search for addresses that exist in your demo data.
 
 ## Understanding Your Data
 

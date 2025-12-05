@@ -233,6 +233,6 @@ This shouldn't happen. If it does:
 
 ## Resources
 
-- Full guide: [docs/STYLE_GUIDE.md](STYLE_GUIDE.md)
+- Full guide: [STYLE_GUIDE.md](STYLE_GUIDE.md)
 - Google C++ Style Guide: https://google.github.io/styleguide/cppguide.html
 - clang-format docs: https://clang.llvm.org/docs/ClangFormat.html
